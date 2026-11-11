@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|purge|upgrade)
+        # 清除软链接
+        rm -f /usr/bin/deepseek-harness
+        rm -f /usr/bin/dsh
+
+        # 刷新桌面与图标缓存
+        if which update-desktop-database >/dev/null 2>&1; then
+            update-desktop-database -q /usr/share/applications || true
+        fi
+
+        if which gtk-update-icon-cache >/dev/null 2>&1; then
+            gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
+        fi
+    ;;
+esac
+
+exit 0

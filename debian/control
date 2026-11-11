@@ -1,0 +1,15 @@
+Package: deepseek-harness
+Version: 0.2.2
+Section: devel
+Priority: optional
+Architecture: ARCH_PLACEHOLDER
+Maintainer: zhichao.xue <xuezhichao@kylinos.cn>
+Depends: libgtk-3-0 (>= 3.20), libnotify4, libnss3, libxss1, libasound2, libxtst6, xdg-utils, libsecret-1-0, libgbm1
+Recommends: git, curl, ca-certificates
+Provides: com.deepseek.harness, dsh-desktop
+Description: DeepSeek Harness - Everything is a Plugin (Kylin OS Edition)
+ DeepSeek Harness (dsh) is an AI Agent development platform and runtime
+ developed by DeepSeek AI, packaged and optimized for Kylin Linux Advanced
+ Desktop V10 and openKylin operating systems.
+ .
+ Built on an everything-is-a-plugin architecture powered by Cordis.

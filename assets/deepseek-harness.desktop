@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=DeepSeek Harness
+Name[zh_CN]=DeepSeek Harness 智能开发工作台
+GenericName=AI Agent Workspace
+GenericName[zh_CN]=智能代码与Agent工作台
+Comment=Next-generation AI Agent Development Platform Powered by DeepSeek
+Comment[zh_CN]=基于 DeepSeek 开源框架构建的下一代 AI Agent 协同与开发平台
+Exec=/opt/deepseek-harness/bin/deepseek-harness %U
+Terminal=false
+Type=Application
+Icon=deepseek-harness
+StartupWMClass=deepseek-harness
+Categories=Development;IDE;Utility;
+Keywords=DeepSeek;Harness;AI;Agent;IDE;LLM;Code;
+Keywords[zh_CN]=深度求索;代码;编程;人工智能;大模型;开发工具;
+MimeType=x-scheme-handler/dsh;
+X-Kylin-Vendor=KylinSec
+X-Kylin-PackageName=deepseek-harness

@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # 建立全局 CLI 软链接
+        mkdir -p /usr/bin
+        ln -sf /opt/deepseek-harness/bin/deepseek-harness /usr/bin/deepseek-harness
+        ln -sf /opt/deepseek-harness/bin/deepseek-harness /usr/bin/dsh
+
+        # 刷新银河麒麟桌面快捷方式数据库与图标缓存
+        if which update-desktop-database >/dev/null 2>&1; then
+            update-desktop-database -q /usr/share/applications || true
+        fi
+
+        if which gtk-update-icon-cache >/dev/null 2>&1; then
+            gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
+        fi
+
+        # 注册 dsh:// URL scheme
+        if which xdg-mime >/dev/null 2>&1; then
+            xdg-mime default deepseek-harness.desktop x-scheme-handler/dsh || true
+        fi
+    ;;
+esac
+
+exit 0

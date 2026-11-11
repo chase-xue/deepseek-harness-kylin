@@ -1,0 +1,64 @@
+#!/bin/bash
+# ==============================================================================
+# DeepSeek Harness - Kylin OS Launcher Script
+# 适配系统：银河麒麟高级服务器/桌面操作系统 (Kylin Linux Advanced Desktop V10 / openKylin)
+# ==============================================================================
+
+set -e
+
+# 定位安装主目录
+APP_DIR="/opt/deepseek-harness"
+if [ ! -d "$APP_DIR" ]; then
+    # 支持本地便携测试模式
+    SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+    if [ -d "$SELF_DIR/opt/deepseek-harness" ]; then
+        APP_DIR="$SELF_DIR/opt/deepseek-harness"
+    else
+        APP_DIR="$SELF_DIR"
+    fi
+fi
+
+# 参数预设
+EXTRA_ARGS=()
+
+# 1. 银河麒麟安全中心 (KYSEC) 与内核 User Namespaces 沙箱兼容性检查
+# 麒麟系统若内核禁用 unprivileged_userns_clone，Electron 需要 --no-sandbox
+if [ -f /proc/sys/kernel/unprivileged_userns_clone ]; then
+    USERNS_ENABLED=$(cat /proc/sys/kernel/unprivileged_userns_clone)
+    if [ "$USERNS_ENABLED" -eq 0 ]; then
+        EXTRA_ARGS+=("--no-sandbox")
+    fi
+elif [ -f /proc/sys/user/max_user_namespaces ]; then
+    MAX_USERNS=$(cat /proc/sys/user/max_user_namespaces)
+    if [ "$MAX_USERNS" -eq 0 ]; then
+        EXTRA_ARGS+=("--no-sandbox")
+    fi
+fi
+
+# 如果是以 root 身份启动，必须强制开启 --no-sandbox
+if [ "$(id -u)" -eq 0 ]; then
+    EXTRA_ARGS+=("--no-sandbox")
+fi
+
+# 2. Wayland / X11 自动适配 (针对 Kylin V10 UKUI 桌面环境)
+if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+    EXTRA_ARGS+=("--ozone-platform-hint=auto" "--enable-features=WaylandWindowDecorations")
+fi
+
+# 3. 环境变量导出
+export ELECTRON_FORCE_IS_PACKAGED=true
+export LD_LIBRARY_PATH="$APP_DIR:$LD_LIBRARY_PATH"
+
+# 4. 启动 Electron 主程序
+EXECUTABLE="$APP_DIR/deepseek-harness"
+
+if [ -x "$EXECUTABLE" ]; then
+    exec "$EXECUTABLE" "${EXTRA_ARGS[@]}" "$@"
+elif which electron >/dev/null 2>&1; then
+    # 若无内置预编译可执行文件，则回退调用系统级 electron 引导 asar
+    exec electron "$APP_DIR/resources/app.asar" "${EXTRA_ARGS[@]}" "$@"
+else
+    echo "错误: 未找到可执行文件 $EXECUTABLE 且未安装系统 electron。" >&2
+    echo "请确认是否完整安装了 deepseek-harness 软件包或运行: sudo apt-get install electron" >&2
+    exit 1
+fi
